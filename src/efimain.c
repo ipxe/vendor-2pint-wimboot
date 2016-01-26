@@ -73,7 +73,7 @@ EFI_STATUS EFIAPI efi_main ( EFI_HANDLE image_handle,
 	bs = systab->BootServices;
 
 	/* Print welcome banner */
-	printf ( "\n\nwimboot " VERSION " -- Windows Imaging Format "
+	printf ( "\n\nwimboot " VERSION " -- 2 Windows Imaging Format "
 		 "bootloader -- http://ipxe.org/wimboot\n\n" );
 
 	/* Get loaded image protocol */

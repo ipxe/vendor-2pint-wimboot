@@ -60,8 +60,27 @@ size_t initrd_len;
 /** bootmgr.exe path within WIM */
 static const wchar_t bootmgr_path[] = L"\\Windows\\Boot\\PXE\\bootmgr.exe";
 
+/** boot.sdi path within WIM for ConfigMgr images*/
+static const wchar_t bootsdi_path[] = L"\\sms\\boot\\boot.sdi";
+
+/** font paths within WIM for all WinPE images*/
+static const wchar_t segmono_path[] = L"\\Windows\\Boot\\Fonts\\segmono_boot.ttf";
+static const wchar_t segoen_path[] = L"\\Windows\\Boot\\Fonts\\segoen_slboot.ttf";
+static const wchar_t segoe_path[] = L"\\Windows\\Boot\\Fonts\\segoe_slboot.ttf";
+static const wchar_t wgl4_path[] = L"\\Windows\\Boot\\Fonts\\wgl4_boot.ttf";
+
+
 /** bootmgr.exe file */
 static struct vdisk_file *bootmgr;
+
+/** boot.sdi file */
+static struct vdisk_file *bootsdi;
+
+/** font files */
+static struct vdisk_file *segmono;
+static struct vdisk_file *segoen;
+static struct vdisk_file *segoe;
+static struct vdisk_file *wgl4;
 
 /** Minimal length of embedded bootmgr.exe */
 #define BOOTMGR_MIN_LEN 16384
@@ -328,7 +347,12 @@ static int add_file ( const char *name, void *data, size_t len ) {
 	file = vdisk_add_file ( name, data, len, read_file );
 
 	/* Check for special-case files */
-	if ( strcasecmp ( name, "bootmgr.exe" ) == 0 ) {
+	if ( strcasecmp ( name, "boot.sdi" ) == 0 ) 
+	{
+		DBG ( "...found boot.sdi\n" );
+		bootsdi = file;
+	}
+	else if ( strcasecmp ( name, "bootmgr.exe" ) == 0 ) {
 		DBG ( "...found bootmgr.exe\n" );
 		bootmgr = file;
 	} else if ( strcasecmp ( name, "bootmgr" ) == 0 ) {
@@ -337,16 +361,38 @@ static int add_file ( const char *name, void *data, size_t len ) {
 		     ( bootmgr = add_bootmgr ( data, len ) ) ) {
 			DBG ( "...extracted bootmgr.exe\n" );
 		}
-	} else if ( strcasecmp ( ( name + strlen ( name ) - 4 ),
-				 ".wim" ) == 0 ) {
+	} 
+	else if ( strcasecmp ( ( name + strlen ( name ) - 4 ), ".wim" ) == 0 ) 
+	{
 		DBG ( "...found WIM file %s\n", name );
 		file->patch = patch_wim;
-		if ( ( ! bootmgr ) &&
-		     ( bootmgr = wim_add_file ( file, cmdline_index,
-						bootmgr_path,
-						L"bootmgr.exe" ) ) ) {
+		if ( ( ! bootmgr ) && ( bootmgr = wim_add_file ( file, cmdline_index,bootmgr_path, L"bootmgr.exe" ) )) 			{
+		{
 			DBG ( "...extracted bootmgr.exe\n" );
 		}
+		/*Look foor boot.sdi for ConfigMgr Images*/
+		if (( ! bootsdi ) &&( wim_add_file ( file, cmdline_index,bootsdi_path, L"boot.sdi" ) ))
+		{
+			DBG ( "...extracted boot.sdi\n" );
+		}
+		if (( ! segmono ) &&( wim_add_file ( file, cmdline_index,segmono_path, L"segmono_boot.ttf" ) ))
+		{
+			DBG ( "...extracted segmono_boot.ttf\n" );
+		}
+		if (( ! segoen ) &&( wim_add_file ( file, cmdline_index,segoen_path, L"segoen_slboot.ttf" ) ))
+		{
+			DBG ( "...extracted segoen_slboot.ttf\n" );
+		}
+		if (( ! segoe ) &&( wim_add_file ( file, cmdline_index,segoe_path, L"segoe_slboot.ttf" ) ))
+		{
+			DBG ( "...extracted segoe_slboot.ttf\n" );
+		}
+		if (( ! wgl4 ) &&( wim_add_file ( file, cmdline_index,wgl4_path, L"wgl4_boot.ttf" ) ))
+		{
+			DBG ( "...extracted wgl4_boot.ttf\n" );
+		}
+	}
+		
 	}
 
 	return 0;

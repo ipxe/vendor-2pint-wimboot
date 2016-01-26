@@ -39,8 +39,27 @@
 /** bootmgfw.efi path within WIM */
 static const wchar_t bootmgfw_path[] = L"\\Windows\\Boot\\EFI\\bootmgfw.efi";
 
+/** boot.sdi path within ConfigMgr WIM */
+static const wchar_t bootsdi_path[] = L"\\sms\\boot\\boot.sdi";
+
+/** font paths within all WIM */
+static const wchar_t segmono_path[] = L"\\Windows\\Boot\\Fonts\\segmono_boot.ttf";
+static const wchar_t segoen_path[] = L"\\Windows\\Boot\\Fonts\\segoen_slboot.ttf";
+static const wchar_t segoe_path[] = L"\\Windows\\Boot\\Fonts\\segoe_slboot.ttf";
+static const wchar_t wgl4_path[] = L"\\Windows\\Boot\\Fonts\\wgl4_boot.ttf";
+
 /** bootmgfw.efi file */
 struct vdisk_file *bootmgfw;
+
+/** boot.sdi file  */
+struct vdisk_file *bootmgfw;
+
+/** file for the fonts */
+struct vdisk_file *bootsdi;
+struct vdisk_file *segmono;
+struct vdisk_file *segoen;
+struct vdisk_file *segoe;
+struct vdisk_file *wgl4;
 
 /**
  * Get architecture-specific boot filename
@@ -207,6 +226,39 @@ void efi_extract ( EFI_HANDLE handle ) {
 							 efi_bootarch() ) ) ) {
 				DBG ( "...extracted %ls\n", bootmgfw_path );
 			}
+
+			if ( ( ! bootsdi ) &&
+			     ( bootsdi = wim_add_file ( vfile, cmdline_index,
+							 bootsdi_path,
+							 L"boot.sdi" ) ) ) {
+				DBG ( "...extracted %ls\n", bootsdi_path );
+			}
+
+			if ( ( ! segmono ) &&
+			     ( segmono = wim_add_file ( vfile, cmdline_index,
+							 segmono_path,
+							 L"segmono_boot.ttf" ) ) ) {
+				DBG ( "...extracted %ls\n", segmono_path );
+			}
+			if ( ( ! segoen ) &&
+			     ( segoen = wim_add_file ( vfile, cmdline_index,
+							 segoen_path,
+							 L"segoen_slboot.ttf" ) ) ) {
+				DBG ( "...extracted %ls\n", segoen_path );
+			}
+			if ( ( ! segoe ) &&
+			     ( segoe = wim_add_file ( vfile, cmdline_index,
+							 segoe_path,
+							 L"segoe_slboot.ttf" ) ) ) {
+				DBG ( "...extracted %ls\n", segoe_path );
+			}
+			if ( ( ! wgl4 ) &&
+			     ( wgl4 = wim_add_file ( vfile, cmdline_index,
+							 wgl4_path,
+							 L"wgl4_boot.ttf" ) ) ) {
+				DBG ( "...extracted %ls\n", wgl4_path );
+			}
+
 		}
 	}
 
